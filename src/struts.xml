@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.1//EN"
+	"http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+
+	<constant name="struts.custom.i18n.resources"
+		value="messageResource"/>
+	<constant name="struts.i18n.encoding" value="utf-8"/>
+
+	<package name="lee" extends="struts-default">
+
+		<!-- 配置系统的拦截器 -->
+		<interceptors>
+			<!-- 定义系统的登录控制的拦截器 -->
+			<interceptor name="authority" 
+				class="auction.action.interceptor.AuthorityInterceptor"/>
+			<!-- 定义系统auctionStack拦截器栈 -->
+			<interceptor-stack name="auctionStack">
+				<!-- 引用系统的默认拦截器栈 -->
+				<interceptor-ref name="defaultStack"/>
+				<!-- 引用登录控制拦截器 -->
+				<interceptor-ref name="authority"/>
+			</interceptor-stack>
+		</interceptors>
+		<!-- 将自定义的拦截器栈定义成默认拦截器栈 -->
+		<default-interceptor-ref name="auctionStack"/>
+
+		<global-results>
+			<!-- 下面定义的结果对所有的Action都有效 -->
+			<result name="login">/login.jsp</result>
+			<result name="exception">/WEB-INF/jsp/error.jsp</result>
+		</global-results>
+
+		<global-exception-mappings>
+			<!-- 指Action抛出AuctionException异常时，转入名为exception的结果。 -->
+			<exception-mapping exception="auction.exception.AuctionException" result="exception"/>
+			<!-- 指Action抛出Exception异常时，转入名为exception的结果。 -->
+			<exception-mapping exception="java.lang.Exception" result="exception"/>
+		</global-exception-mappings>
+
+
+		<action name="index">
+			<result name="success">/WEB-INF/jsp/main.jsp</result>
+		</action>
+
+		<action name="viewItemSu" class="auction.action.ViewSuAction">
+			<result name="success">/WEB-INF/jsp/viewSuccess.jsp</result>	
+		</action>
+
+		<action name="viewFailItem" class="auction.action.ViewFailAction">
+			<result name="success">/WEB-INF/jsp/viewFail.jsp</result>	
+		</action>
+
+		<action name="viewBid" class="auction.action.ViewBidAction">
+			<result name="success">/WEB-INF/jsp/viewBid.jsp</result>	
+		</action>
+
+		<action name="mgrItem" class="auction.action.MgrItemAction">
+			<result name="success">/WEB-INF/jsp/mgrItem.jsp</result>
+		</action>
+		<!-- 关于kind类型的配置 -->
+		<action name="mgrKind" class="auction.action.MgrKindAction">
+			<result name="success">/WEB-INF/jsp/mgrKind.jsp	</result>	
+		</action>
+		<action name="delKind" class="auction.action.DelKindAction">
+			<result name="success">/WEB-INF/jsp/mgrKind.jsp</result>	
+			<result name="failure">/WEB-INF/jsp/mgrKind.jsp</result>	
+		</action>
+		<action name="proUpdateKind" class="auction.action.UpdateKindAction" method="proUpdateKind">
+			<result name="success">/WEB-INF/jsp/mgrUpKind.jsp</result>	
+			<result name="failure" type="chain">mgrKind</result>	
+		</action>
+		<action name="updateKind" class="auction.action.UpdateKindAction" method="execute">
+			<result name="input" type="chain">mgrKind</result>	
+			<result name="success" type="chain">mgrKind</result>
+		</action>
+		<action name="viewKind" class="auction.action.ViewKindAction">
+			<result name="success">/WEB-INF/jsp/viewKind.jsp</result>	
+		</action>
+		
+		<!-- 关于item的配置 -->
+		<action name="viewItem" class="auction.action.ViewItemAction">
+			<result name="input">viewKind.action</result>	
+			<result name="success">/WEB-INF/jsp/viewItem.jsp</result>  
+		 </action>
+		<action name="viewDetail" class="auction.action.ViewDetailAction">
+			<result name="error">/WEB-INF/jsp/error.jsp</result>
+			<result name="success">/WEB-INF/jsp/viewDetail.jsp</result>
+		</action>
+		<action name="delItem" class="auction.action.DelItemAction">
+			<result name="success" type="chain">mgrItem</result>	
+			<result name="failure" type="chain">mgrItem</result>	
+		</action>
+		<action name="proUpdateItem" class="auction.action.UpdateItemAction" method="proUpdateItem">
+			<result name="success">/WEB-INF/jsp/mgrUpItem.jsp</result>	
+			<result name="failure" type="chain">mgrItem</result>	
+		</action>
+		<action name="updateItem" class="auction.action.UpdateItemAction" method="execute">
+			<result name="success" type="chain">mgrItem</result>	
+			<result name="failure" type="chain">mgrItem</result>	
+		</action>
+
+		
+		<!-- 配置处理用户登出的Action-->
+		<action name="logOut" class="auction.action.LoginOutAction" >
+			<result name="success">/login.jsp</result>
+		</action>
+ 		
+ 		<!-- 配置处理用户登录的Action -->
+		<action name="processLogin" class="auction.action.LoginAction">
+			<!-- 配置处理用户登录后的Result -->
+			<result name="input">/login.jsp</result> 
+			<result name="success">/WEB-INF/jsp/main.jsp</result>
+			<result name="failure">/login.jsp</result>
+			<!-- 显式引用系统默认拦截器栈 -->
+			<interceptor-ref name="defaultStack"/>
+		</action>
+
+		<action name="proAddItem" class="auction.action.AddItemAction">
+			<result name="input" type="chain">mgrItem</result>	
+			<result name="success" type="chain">mgrItem</result>
+		</action>
+		<action name="proAddKind" class="auction.action.AddKindAction">
+			<result name="input" type="chain">mgrKind</result>	
+			<result name="success" type="chain">mgrKind</result>
+		</action>
+		<action name="bid" class="auction.action.AddBidAction">
+			<result name="input" type="chain">viewDetail</result>	
+			<result name="success" type="chain">viewBid</result>
+		</action>
+
+	</package> 
+
+</struts>
